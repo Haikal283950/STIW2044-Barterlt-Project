@@ -326,8 +326,8 @@ class _add_itemState extends State<add_item> {
       'image5': base64ed.length >= 5 ? base64ed[4] : '',
       'user_id': widget.user.user_id,
     }).then((response) {
-      print(response.body);
       if (response.statusCode == 200) {
+        print(response.body);
         var jsondata = jsonDecode(response.body);
         if (jsondata['status'] == 'success') {
           _showRoundedSnackbar(context, "Item added!");
@@ -336,7 +336,7 @@ class _add_itemState extends State<add_item> {
         }
         Navigator.pop(context);
       } else {
-        print(response.body.toString());
+        print(response.body);
         _showRoundedSnackbar(
             context,
             "Error connecting to the database!" +

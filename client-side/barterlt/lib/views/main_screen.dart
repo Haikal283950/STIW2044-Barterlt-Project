@@ -4,6 +4,7 @@ import 'package:barterlt/views/shopping_cart.dart';
 import 'package:barterlt/views/tab_page1.dart';
 import 'package:barterlt/views/tab_page2.dart';
 import 'package:barterlt/views/tab_page3.dart';
+import 'package:barterlt/views/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -61,8 +62,14 @@ class _main_screenState extends State<main_screen> {
         actions: [
           IconButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => login_screen()));
+                widget.user.user_id == ""
+                    ? Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => login_screen()))
+                    : Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                UserProfile(user: widget.user)));
               },
               icon: Icon(
                 Icons.person,
@@ -118,8 +125,16 @@ class _main_screenState extends State<main_screen> {
                 shape: CircleBorder(),
                 child: Icon(Icons.shopping_cart),
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ShoppingCart()));
+                  widget.user.user_id == ""
+                      ? Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => login_screen()))
+                      : Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ShoppingCart(user: widget.user)));
                 },
               )
             ]),
@@ -160,7 +175,7 @@ class _main_screenState extends State<main_screen> {
         borderRadius: BorderRadius.circular(16.0),
       ),
       content: Text(
-        "Welcome back",
+        "Hey there" + " " + userText + "!",
         style: TextStyle(color: Colors.white, fontFamily: "gotham"),
       ),
       duration: Duration(seconds: 3),

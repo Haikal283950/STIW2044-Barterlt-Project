@@ -233,14 +233,25 @@ class _tab_page2State extends State<tab_page2> {
         duration: Duration(seconds: 1));
   }
 
+  SnackBar buildEmpty(String text) {
+    return SnackBar(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        content: Text(text),
+        duration: Duration(seconds: 1));
+  }
+
   InkWell buildOwnedItemCards(int index, BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return itemDetails(
-            product: productList[index],
-          );
-        }));
+        int.parse(productList[index].productQuantity) < 1
+            ? ScaffoldMessenger.of(context)
+                .showSnackBar(buildEmpty("It is out of stock!"))
+            : Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return itemDetails(
+                  product: productList[index],
+                  user: widget.user,
+                );
+              }));
       },
       child: Card(
         shadowColor: Color.fromARGB(172, 87, 41, 211),

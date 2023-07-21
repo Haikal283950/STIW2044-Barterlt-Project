@@ -8,21 +8,23 @@ import 'package:http/http.dart' as http;
 import '../model/product.dart';
 import '../model/user.dart';
 import '../myConfig.dart';
+import 'login_screen.dart';
 
 class itemDetails extends StatefulWidget {
+  final User user;
   final Product product;
-  const itemDetails({super.key, required this.product});
+  const itemDetails({super.key, required this.product, required this.user});
 
   @override
   State<itemDetails> createState() => _itemDetailsState();
 }
 
 class _itemDetailsState extends State<itemDetails> {
-  Future<User>? user;
+  Future<User>? seller;
   String? productText;
   void initState() {
     super.initState();
-    user = sendRequest(widget.product.productId.toString());
+    seller = sendRequest(widget.product.productId.toString());
     if (int.parse(widget.product.productQuantity) < 10) {
       productText =
           "Only " + widget.product.productQuantity.toString() + " left!";
@@ -169,7 +171,17 @@ class _itemDetailsState extends State<itemDetails> {
                         future:
                             sendRequest(widget.product.productId.toString())),
                     ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          widget.user.user_id == ""
+                              ? Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => login_screen()))
+                              : addToCart(
+                                  widget.product.productId.toString(),
+                                  widget.user.user_id.toString(),
+                                  widget.product.seller_id);
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -208,5 +220,47 @@ class _itemDetailsState extends State<itemDetails> {
     var jsonData = jsonDecode(response.body);
     var userJson = jsonData[0];
     return User.fromJson(userJson);
+  }
+
+  Future<void> addToCart(
+      String product_id, String user_id, String seller_id) async {
+    print(
+        "Client side logs\n" + product_id + "\n" + user_id + "\n" + seller_id);
+    final response = await http
+        .post(Uri.parse(server + "/barterlt/php/add_to_cart.php"), body: {
+      'product_id': product_id,
+      'user_id': user_id,
+      'seller_id': seller_id
+    }).then((response) {
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonResponse = json.decode(response.body);
+        if (jsonResponse['status'] == 'success') {
+          print("Item inserted!");
+          _showRoundedSnackbar(context, "Item added to cart!");
+        } else {
+          print("Item failed to be inserted!");
+          _showRoundedSnackbar(context, "Item failed to be added to cart!");
+        }
+      } else {}
+      print(response.body);
+    });
+  }
+
+  Future<void> _showRoundedSnackbar(BuildContext context, String message) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Add to Cart"),
+            content: Text(message),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Ok"))
+            ],
+          );
+        });
   }
 }

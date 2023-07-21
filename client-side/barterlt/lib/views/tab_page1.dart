@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 import '../model/user.dart';
+import 'login_screen.dart';
 
 class tab_page1 extends StatefulWidget {
   final User user;
@@ -31,62 +32,80 @@ class _tab_page1State extends State<tab_page1> {
   @override
   Widget build(BuildContext context) {
     return LiquidPullToRefresh(
-      color: Color.fromARGB(172, 87, 41, 211),
-      onRefresh: sendDefaultMethod,
-      child: Center(
-          child: productList.isEmpty
-              ? Center(child: Text("No items found!"))
-              : Center(
-                  child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Column(
+        color: Color.fromARGB(172, 87, 41, 211),
+        onRefresh: sendDefaultMethod,
+        child: Center(
+            child: widget.user.user_id == ""
+                ? Center(
+                    child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        flex: 9,
-                        child: GridView.count(
-                          mainAxisSpacing: 4,
-                          crossAxisSpacing: 0.1,
-                          childAspectRatio: 0.63,
-                          crossAxisCount: 2,
-                          children: List.generate(productList.length,
-                              (index) => buildOwnedItemCards(index, context)),
-                        ),
-                      ),
-                      Expanded(
-                          flex: 1,
-                          child: ListView.builder(
-                              itemCount: pageTotal,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, index) {
-                                if ((currentPage - 1) == index) {
-                                  color = Colors.blue;
-                                } else {
-                                  color = Colors.grey;
-                                }
-                                return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        selectedIndex = index + 1;
-                                        sendRequest(index + 1);
-                                        setState(() {
-                                          currentPage = index + 1;
-                                        });
-                                      },
-                                      child: CircleAvatar(
-                                          backgroundColor: color,
-                                          child: Text(
-                                            (index + 1).toString(),
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold),
-                                          )),
-                                    ));
-                              }))
+                      Text("Login first to access your items"),
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => login_screen()));
+                          },
+                          child: Text("Login"))
                     ],
-                  ),
-                ))),
-    );
+                  ))
+                : productList.isEmpty
+                    ? Center(child: Text("No items found"))
+                    : Center(
+                        child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              flex: 9,
+                              child: GridView.count(
+                                mainAxisSpacing: 4,
+                                crossAxisSpacing: 0.1,
+                                childAspectRatio: 0.63,
+                                crossAxisCount: 2,
+                                children: List.generate(
+                                    productList.length,
+                                    (index) =>
+                                        buildOwnedItemCards(index, context)),
+                              ),
+                            ),
+                            Expanded(
+                                flex: 1,
+                                child: ListView.builder(
+                                    itemCount: pageTotal,
+                                    scrollDirection: Axis.horizontal,
+                                    itemBuilder: (context, index) {
+                                      if ((currentPage - 1) == index) {
+                                        color = Colors.blue;
+                                      } else {
+                                        color = Colors.grey;
+                                      }
+                                      return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: InkWell(
+                                            onTap: () {
+                                              selectedIndex = index + 1;
+                                              sendRequest(index + 1);
+                                              setState(() {
+                                                currentPage = index + 1;
+                                              });
+                                            },
+                                            child: CircleAvatar(
+                                                backgroundColor: color,
+                                                child: Text(
+                                                  (index + 1).toString(),
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                )),
+                                          ));
+                                    }))
+                          ],
+                        ),
+                      ))));
   }
 
   Future<void> sendDefaultMethod() async {

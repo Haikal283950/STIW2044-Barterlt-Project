@@ -33,6 +33,15 @@ if (isset($_POST['product_id'])) {
         sendJsonResponse(array()); 
     }
 }
+if(isset($_POST['user_id'])) {
+    $user_id = $_POST['user_id'];
+    $sql = "SELECT * FROM `product_table` WHERE user_id = '$user_id'";
+    $result = $connect->query($sql);
+    while ($row = $result->fetch_assoc()) {
+        $usernames[] = $row['username'];
+    }
+    sendJsonResponse(array('status' => 'success', 'data' => $usernames));
+}
 
 function sendJsonResponse($sentArray)
 {
